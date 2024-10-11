@@ -1,0 +1,51 @@
+<h2>Join Room {{ model.session.roomId() }}</h2>
+
+<form
+  *ngIf="!model.session.client.participantName()"
+  (ngSubmit)="joinRoom(nameInput.value)"
+>
+  <input #nameInput type="text" placeholder="Enter your name" required />
+  <button type="submit">Join Room</button>
+</form>
+
+<div *ngIf="model.session.client.participantName">
+  <p>Welcome, {{ model.session.client.participantName }}!</p>
+  <!-- Questionnaire view will be added later -->
+</div>
+
+<div
+  *ngIf="
+    model.session.currentPhase() === 'questions' &&
+    model.session.currentQuestionIndex() <= model.standardQuestions().length
+  "
+>
+  <h3>Question {{ model.session.currentQuestionIndex() + 1 }}:</h3>
+  <p>
+    {{ model.standardQuestions()[model.session.currentQuestionIndex()].title }}
+  </p>
+  <form (ngSubmit)="submitAnswer('test')">
+    <div
+      *ngFor="
+        let option of model.standardQuestions()[
+          model.session.currentQuestionIndex()
+        ].options
+      "
+    >
+      <label>
+        <input
+          type="radio"
+          [value]="option"
+          name="option"
+          [(ngModel)]="selectedOption"
+          required
+        />
+        {{ option.text }}
+      </label>
+    </div>
+    <button type="submit" [disabled]="!selectedOption">Submit Answer</button>
+  </form>
+</div>
+
+<div *ngIf="model.session.currentPhase() === 'waiting'">
+  <p>Waiting for the host to start the questionnaire...</p>
+</div>

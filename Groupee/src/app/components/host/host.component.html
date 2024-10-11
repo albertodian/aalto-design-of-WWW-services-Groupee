@@ -1,0 +1,56 @@
+<h2>Host Dashboard</h2>
+<p>Your room ID: {{ model.session.roomId() | json }}</p>
+<p>Share this link with participants:</p>
+<input type="text" [value]="model.session.participantLink()" readonly />
+
+<div *ngIf="model.session.online()">
+  <h3>Participants:</h3>
+  <ul>
+    <li *ngFor="let participant of model.session.participants()">
+      {{ participant.name }}
+    </li>
+  </ul>
+  <!-- Questionnaire controls will be added later -->
+
+  <button
+    *ngIf="model.session.currentPhase() === 'waiting'"
+    (click)="startQuestionnaire()"
+  >
+    Start Questionnaire
+  </button>
+
+  <div
+    *ngIf="
+      !!model.session.online() && model.session.currentPhase() === 'questions'
+    "
+  >
+    <h3>
+      Question
+      {{ model.session.currentQuestionIndex() + 1 }}:
+    </h3>
+    <p>{{ getCurrentQuestion()?.title }}</p>
+    <ul>
+      <li
+        *ngFor="
+          let option of model.standardQuestions()[
+            model.session.currentQuestionIndex()
+          ].options
+        "
+      >
+        {{ option?.text ? option?.text : option }}
+      </li>
+    </ul>
+    <button (click)="nextQuestion()">Next Question</button>
+  </div>
+
+  <div
+    *ngIf="
+      model.session.currentPhase() !== 'questions' &&
+      model.session.currentPhase() !== 'waiting' &&
+      model.session.currentQuestionIndex() >= model.standardQuestions().length
+    "
+  >
+    <h3>Questionnaire Completed!</h3>
+    <!-- Display participant answers here -->
+  </div>
+</div>
